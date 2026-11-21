@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase Lab</title>
+<style>:root{--ink:#1F2733;--bg:#FAF8F4;--card:#fff;--muted:#5F6B7A;--line:#D5DAE1;--soft:#F2F4F7;
+--r:#C0392B;--rt:#FDECEA;--b:#2B5BBA;--bt:#E7EEFA;--a:#A86A0B;--at:#FCF1DC;--g:#2F7D4F;--gt:#E5F3EA;--navy:#1B2333}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Calibri,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--b);text-transform:uppercase}
+h1{font-size:32px;margin:4px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:920px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 18px;font-weight:700;cursor:pointer;color:var(--ink);font-size:15px}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pane{display:none}.pane.on{display:block}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.panel h3{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctl{margin-bottom:14px}
+.ctl label{display:flex;justify-content:space-between;font-weight:600;font-size:15px}
+.ctl label span{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--b)}
+.ctl small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+input[type=range]{width:100%;accent-color:var(--b)}
+textarea,input[type=text]{width:100%;font:16px/1.45 inherit;font-family:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.btn{background:var(--b);color:#fff;border:0;border-radius:9px;padding:9px 15px;font-weight:700;cursor:pointer;font-size:15px}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.red{background:var(--r)}.btn.green{background:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.chip{border-radius:999px;padding:3px 11px;font-weight:700;font-size:14px}
+.chip.b{background:var(--bt);color:var(--b)}.chip.r{background:var(--rt);color:var(--r)}.chip.a{background:var(--at);color:var(--a)}.chip.g{background:var(--gt);color:var(--g)}.chip.off{opacity:.35}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.stat{border-radius:12px;padding:10px 14px;background:var(--soft)}
+.stat .v{font-size:26px;font-weight:800}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat.r{background:var(--rt)}.stat.r .v{color:var(--r)}
+.stat.b{background:var(--bt)}.stat.b .v{color:var(--b)}
+.stat.a{background:var(--at)}.stat.a .v{color:var(--a)}
+.stat.g{background:var(--gt)}.stat.g .v{color:var(--g)}
+.note{color:var(--muted);font-size:14px;margin-top:10px}
+.formula{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--at);border-radius:10px;padding:10px 14px;font-size:15px;margin-top:12px;color:var(--a)}
+.toy{display:inline-block;background:var(--at);color:var(--a);font-weight:800;font-size:12px;letter-spacing:.08em;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+mark.al{background:var(--bt);color:var(--b);font-weight:700;border-radius:4px;padding:0 2px}
+mark.mi{background:var(--rt);color:var(--r);font-weight:700;border-radius:4px;padding:0 2px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",Calibri,sans-serif;fill:var(--muted);font-size:12px}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--soft);vertical-align:top}
+
+.grid3{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:1000px){.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">TARA · Week 11 · Emergent Misalignment</div>
+  <h1>Phase Lab: grow, then turn <span class="toy">TOY DATA</span></h1>
+  <p class="lead">A made-up training run of a rank-1 LoRA's B vector in 64 dimensions, saved every 5 steps like the real checkpoints. The vector grows smoothly but <b>turns</b> sharply at a hidden step. The three plots use the same maths as your notebook functions: norm, PCA, and local cosine similarity.</p>
+  <div class="layout">
+    <div>
+      <div class="panel">
+        <h3>The toy training run</h3>
+        <div class="ctl"><label>turn happens at step <span id="tv">180</span></label><input type="range" id="T" min="60" max="260" step="5" value="180"><small>The paper's rank-1 B rotated around step 180.</small></div>
+        <div class="ctl"><label>how long the turn takes (steps) <span id="wv">10</span></label><input type="range" id="W" min="5" max="80" step="5" value="10"><small>B swings to its new direction over this many training steps. 10 = sudden turn; 80 = slow, gradual turn. Try 80: the dip almost vanishes, so a slow turn is hard to spot.</small></div>
+        <div class="ctl"><label>random wobble per step <span id="nv">0.0015</span></label><input type="range" id="N" min="0" max="0.01" step="0.0005" value="0.0015"><small>Real training is noisy: each step, B also moves a little in a random direction. More wobble = a bumpier cosine curve, and the lowest point can land in the wrong place. A bigger k helps.</small></div>
+        <button class="btn ghost" id="re">New random run</button>
+      </div>
+      <div class="panel">
+        <h3>The detector</h3>
+        <div class="ctl"><label>k (in steps) <span id="kv">10</span></label><input type="range" id="K" min="5" max="40" step="5" value="10"><small>How far back and ahead to compare. Checkpoints are 5 steps apart, so k = 10 means 2 checkpoints each way.</small></div>
+        <div class="ctl"><label>magnitude_threshold <span id="mv">0.00</span></label><input type="range" id="M" min="0" max="0.4" step="0.01" value="0"><small>Skip checkpoints where B barely moved (both steps tiny): their cosine is mostly wobble.</small></div>
+        <div class="stats">
+          <div class="stat r"><div class="v" id="found">–</div><div class="k">detected step (min cosine)</div></div>
+          <div class="stat"><div class="v" id="truth">180</div><div class="k">true turn step</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="panel"><h3>1 · Norm ‖B‖ over training</h3><svg id="g1" viewBox="0 0 440 260"></svg><div class="note">Smooth. You can't see the turn here.</div></div>
+      <div class="panel"><h3>2 · PCA path (PC1 vs PC2)</h3><svg id="g2" viewBox="0 0 440 260"></svg><div class="note" id="var"></div></div>
+      <div class="panel" style="grid-column:1/-1"><h3>3 · Local cosine similarity</h3><svg id="g3" viewBox="0 0 900 260"></svg><div class="note">Not inverted here: the turn is a <b>dip</b>. (The notebook's plot flips the y-axis for B, so there it shows as a peak.)</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const NS='http://www.w3.org/2000/svg';
+function el(tag,a,p,t){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(t!==undefined)e.textContent=t;p&&p.appendChild(e);return e;}
+let seed=5;function rnd(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}
+function gauss(){let u=0;while(u===0)u=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*rnd());}
+const D=64,STEPS=300,EVERY=5;let runSeed=1;
+function unit(v){const n=Math.hypot(...v);return v.map(x=>x/n);}
+function dot(a,b){let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+function makeRun(){
+  seed=runSeed*7919+3;
+  const d1=unit(Array.from({length:D},gauss));let d2=unit(Array.from({length:D},gauss));const p=dot(d1,d2);d2=unit(d2.map((x,i)=>x-p*d1[i]));
+  const T=+$('T').value,W=+$('W').value,noise=+$('N').value;
+  const ck=[];let walk=new Array(D).fill(0);
+  for(let s=0;s<=STEPS;s+=EVERY){
+    const norm=0.04+1.0*Math.pow(s/STEPS,1.3);                 // smooth growth
+    const th=(Math.PI/2)*0.85/(1+Math.exp(-(s-T)/(W/4)));       // sigmoid turn
+    const drift=0.15*s/STEPS;                                   // slow drift before
+    for(let i=0;i<D;i++)walk[i]+=gauss()*noise;
+    const v=d1.map((x,i)=>norm*(Math.cos(th+drift)*x+Math.sin(th+drift)*d2[i])+walk[i]);
+    ck.push({step:s,v});
+  }
+  return ck;
+}
+// PCA via power iteration on centred data
+function pca2(X){const n=X.length,d=X[0].length;const mu=new Array(d).fill(0);X.forEach(r=>r.forEach((x,i)=>mu[i]+=x/n));const C=X.map(r=>r.map((x,i)=>x-mu[i]));
+  const tot=C.reduce((s,r)=>s+dot(r,r),0);const comps=[],vars=[];let R=C.map(r=>r.slice());
+  for(let c=0;c<2;c++){let w=unit(Array.from({length:d},(_, i)=>Math.sin(i*7.3+c)+1.1));for(let it=0;it<200;it++){const s=R.map(r=>dot(r,w));const nw=new Array(d).fill(0);R.forEach((r,j)=>r.forEach((x,i)=>nw[i]+=x*s[j]));w=unit(nw);}
+    const s=R.map(r=>dot(r,w));vars.push(s.reduce((a,b)=>a+b*b,0)/tot);comps.push(w);R=R.map((r,j)=>r.map((x,i)=>x-s[j]*w[i]));}
+  return {xy:C.map(r=>[dot(r,comps[0]),dot(r,comps[1])]),vars};}
+// exactly the notebook's local cosine similarity
+function localCos(ck,k,thr){if(k%EVERY)throw Error('k must divide by 5');const K=k/EVERY,out=[];
+  for(let i=K;i<ck.length-K;i++){const b=ck[i].v.map((x,j)=>x-ck[i-K].v[j]),a=ck[i+K].v.map((x,j)=>x-ck[i].v[j]);const nb=Math.hypot(...b),na=Math.hypot(...a);
+    if(Math.max(nb,na)<thr)continue;out.push([ck[i].step,(nb===0||na===0)?0:dot(b,a)/(nb*na)]);}return out;}
+function axes(svg,W,H,xl,yl){el('line',{x1:40,y1:H-30,x2:W-10,y2:H-30,stroke:'#D5DAE1'},svg);el('line',{x1:40,y1:10,x2:40,y2:H-30,stroke:'#D5DAE1'},svg);el('text',{x:W-10,y:H-8,'text-anchor':'end'},svg,xl);el('text',{x:44,y:20},svg,yl);}
+function color(t){const a=[76,120,200],b=[224,162,26];return `rgb(${a.map((x,i)=>Math.round(x+(b[i]-x)*t)).join(',')})`;}
+function draw(){
+  ['T','W','N','K','M'].forEach(id=>{});
+  $('tv').textContent=$('T').value;$('wv').textContent=$('W').value;$('nv').textContent=(+$('N').value).toFixed(4);$('kv').textContent=$('K').value;$('mv').textContent=(+$('M').value).toFixed(2);$('truth').textContent=$('T').value;
+  const ck=makeRun();
+  // 1 norm
+  const g1=$('g1');g1.innerHTML='';axes(g1,440,260,'step →','‖B‖');const norms=ck.map(c=>Math.hypot(...c.v));const mx=Math.max(...norms);
+  el('polyline',{points:ck.map((c,i)=>`${40+c.step/STEPS*390},${230-norms[i]/mx*210}`).join(' '),fill:'none',stroke:'#2B5BBA','stroke-width':2.5},g1);
+  [0,100,200,300].forEach(s=>el('text',{x:40+s/STEPS*390,y:246,'text-anchor':'middle'},g1,s));
+  // 2 pca
+  const g2=$('g2');g2.innerHTML='';const {xy,vars}=pca2(ck.map(c=>c.v));axes(g2,440,260,'PC1','PC2');
+  const xs=xy.map(p=>p[0]),ys=xy.map(p=>p[1]);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const px=x=>50+(x-x0)/(x1-x0||1)*370,py=y=>220-(y-y0)/(y1-y0||1)*195;
+  el('polyline',{points:xy.map(p=>`${px(p[0])},${py(p[1])}`).join(' '),fill:'none',stroke:'#D5DAE1','stroke-width':1.5},g2);
+  xy.forEach((p,i)=>el('circle',{cx:px(p[0]),cy:py(p[1]),r:3.5,fill:color(i/(xy.length-1))},g2));
+  const ti=ck.findIndex(c=>c.step>=+$('T').value);if(ti>=0)el('circle',{cx:px(xy[ti][0]),cy:py(xy[ti][1]),r:8,fill:'none',stroke:'#C0392B','stroke-width':2},g2);
+  [[0,'step 0'],[xy.length-1,'step 300']].forEach(([i,t])=>el('text',{x:px(xy[i][0])+6,y:py(xy[i][1])-6},g2,t));
+  $('var').innerHTML=`PC1 ${(vars[0]*100).toFixed(0)}% + PC2 ${(vars[1]*100).toFixed(0)}% = <b>${((vars[0]+vars[1])*100).toFixed(0)}%</b> of the variance. Red ring = true turn. Colour = step (blue → gold).`;
+  // 3 cosine
+  const g3=$('g3');g3.innerHTML='';axes(g3,900,260,'step →','local cosine');
+  const k=+$('K').value,thr=+$('M').value;const lc=localCos(ck,k,thr);
+  const X=s=>40+s/STEPS*850,Y=c=>130-c*100;
+  el('line',{x1:40,y1:Y(0),x2:890,y2:Y(0),stroke:'#EEF1F3','stroke-dasharray':'4 4'},g3);el('text',{x:36,y:Y(1)+4,'text-anchor':'end'},g3,'1');el('text',{x:36,y:Y(0)+4,'text-anchor':'end'},g3,'0');el('text',{x:36,y:Y(-1)+4,'text-anchor':'end'},g3,'−1');
+  el('line',{x1:X(+$('T').value),y1:10,x2:X(+$('T').value),y2:230,stroke:'#9AA4B1','stroke-dasharray':'5 4'},g3);el('text',{x:X(+$('T').value)+4,y:22},g3,'true turn');
+  if(lc.length){el('polyline',{points:lc.map(([s,c])=>`${X(s)},${Y(c)}`).join(' '),fill:'none',stroke:'#A86A0B','stroke-width':2.5},g3);lc.forEach(([s,c])=>el('circle',{cx:X(s),cy:Y(c),r:2.5,fill:'#A86A0B'},g3));
+    let mi=0;lc.forEach((p,i)=>{if(p[1]<lc[mi][1])mi=i;});el('circle',{cx:X(lc[mi][0]),cy:Y(lc[mi][1]),r:8,fill:'none',stroke:'#C0392B','stroke-width':2.5},g3);el('text',{x:X(lc[mi][0])+10,y:Y(lc[mi][1])+4,fill:'#C0392B','font-weight':700},g3,`min at step ${lc[mi][0]}`);
+    $('found').textContent=lc[mi][0];}else $('found').textContent='none';
+  [0,50,100,150,200,250,300].forEach(s=>el('text',{x:X(s),y:246,'text-anchor':'middle'},g3,s));
+}
+['T','W','N','K','M'].forEach(id=>$(id).oninput=draw);$('re').onclick=()=>{runSeed++;draw();};draw();
+</script>
+</body>
+</html>

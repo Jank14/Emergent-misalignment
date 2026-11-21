@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steering Lab</title>
+<style>:root{--ink:#1F2733;--bg:#FAF8F4;--card:#fff;--muted:#5F6B7A;--line:#D5DAE1;--soft:#F2F4F7;
+--r:#C0392B;--rt:#FDECEA;--b:#2B5BBA;--bt:#E7EEFA;--a:#A86A0B;--at:#FCF1DC;--g:#2F7D4F;--gt:#E5F3EA;--navy:#1B2333}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Calibri,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--b);text-transform:uppercase}
+h1{font-size:32px;margin:4px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:920px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 18px;font-weight:700;cursor:pointer;color:var(--ink);font-size:15px}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pane{display:none}.pane.on{display:block}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.panel h3{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctl{margin-bottom:14px}
+.ctl label{display:flex;justify-content:space-between;font-weight:600;font-size:15px}
+.ctl label span{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--b)}
+.ctl small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+input[type=range]{width:100%;accent-color:var(--b)}
+textarea,input[type=text]{width:100%;font:16px/1.45 inherit;font-family:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.btn{background:var(--b);color:#fff;border:0;border-radius:9px;padding:9px 15px;font-weight:700;cursor:pointer;font-size:15px}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.red{background:var(--r)}.btn.green{background:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.chip{border-radius:999px;padding:3px 11px;font-weight:700;font-size:14px}
+.chip.b{background:var(--bt);color:var(--b)}.chip.r{background:var(--rt);color:var(--r)}.chip.a{background:var(--at);color:var(--a)}.chip.g{background:var(--gt);color:var(--g)}.chip.off{opacity:.35}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.stat{border-radius:12px;padding:10px 14px;background:var(--soft)}
+.stat .v{font-size:26px;font-weight:800}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat.r{background:var(--rt)}.stat.r .v{color:var(--r)}
+.stat.b{background:var(--bt)}.stat.b .v{color:var(--b)}
+.stat.a{background:var(--at)}.stat.a .v{color:var(--a)}
+.stat.g{background:var(--gt)}.stat.g .v{color:var(--g)}
+.note{color:var(--muted);font-size:14px;margin-top:10px}
+.formula{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--at);border-radius:10px;padding:10px 14px;font-size:15px;margin-top:12px;color:var(--a)}
+.toy{display:inline-block;background:var(--at);color:var(--a);font-weight:800;font-size:12px;letter-spacing:.08em;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+mark.al{background:var(--bt);color:var(--b);font-weight:700;border-radius:4px;padding:0 2px}
+mark.mi{background:var(--rt);color:var(--r);font-weight:700;border-radius:4px;padding:0 2px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",Calibri,sans-serif;fill:var(--muted);font-size:12px}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--soft);vertical-align:top}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">TARA · Week 11 · Emergent Misalignment</div>
+  <h1>Steering Lab</h1>
+  <p class="lead">Three small experiments behind Part 3: what the steering rule does to a vector, why a difference of means picks up <i>every</i> difference between your two groups, and why a cosine of 0.12 is large in 5,120 dimensions.</p>
+  <div class="tabs">
+    <button class="tab on" data-p="p1">1 · The steering rule</button>
+    <button class="tab" data-p="p2">2 · What did v capture?</button>
+    <button class="tab" data-p="p3">3 · Is 0.12 a big cosine?</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div class="pane on" id="p1">
+    <div class="layout">
+      <div class="panel">
+        <h3>Controls</h3>
+        <div class="ctl"><label>steering_coef <span id="cv">0.40</span></label><input type="range" id="coef" min="0" max="1.5" step="0.05" value="0.4"><small>How long the push is, as a fraction of h's own length.</small></div>
+        <div class="ctl"><label>direction of v̂ <span id="av">60°</span></label><input type="range" id="ang" min="0" max="359" step="1" value="60"></div>
+        <div class="ctl"><label style="justify-content:flex-start;gap:8px"><input type="checkbox" id="all" checked> apply_to_all_tokens</label><small>Off: only the last position is steered.</small></div>
+        <div class="note">Click the plot to move h (the hidden state of the last token).</div>
+        <div class="formula">h ← h + coef · ‖h‖ · v̂</div>
+        <div class="note" id="worked" style="font-size:15px;line-height:1.5"></div>
+      </div>
+      <div>
+        <div class="panel">
+          <h3>One token, in 2D <span class="toy">TOY 2D PICTURE</span></h3>
+          <svg id="vec" viewBox="0 0 620 360"></svg>
+          <div class="stats">
+            <div class="stat"><div class="v" id="hn">0</div><div class="k">‖h‖</div></div>
+            <div class="stat r"><div class="v" id="add">0</div><div class="k">push length = coef × ‖h‖</div></div>
+            <div class="stat b"><div class="v" id="turn">0°</div><div class="k">how far h turned</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Every token has its own ‖h‖ <span class="toy">TOY NUMBERS</span></h3>
+          <svg id="toks" viewBox="0 0 620 170"></svg>
+          <div class="note">Because the push scales with each token's own norm, the same coefficient means "the same fraction" everywhere. Grey = untouched.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div class="pane" id="p2">
+    <div class="layout">
+      <div class="panel">
+        <h3>Make the two groups <span class="toy">TOY MODEL</span></h3>
+        <div class="note" style="margin-top:0"><b>Step 1: pick an attempt.</b></div>
+        <div style="margin:6px 0 10px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn ghost" id="att1">Attempt 1: tags, layer −2</button>
+          <button class="btn ghost" id="att2">Attempt 2: no tags, layer 24</button>
+        </div>
+        <div class="note"><b>Step 2: the two groups can differ in two ways.</b></div>
+        <div class="ctl" style="margin-top:8px"><label>① misalignment gap <span id="cdv">1.0</span></label><input type="range" id="cd" min="0" max="3" step="0.1" value="1"><small>How differently the two groups <b>think</b> (helpful vs harmful). This is the difference we <b>want</b> v to capture. 0 = they think the same.</small></div>
+        <div class="ctl"><label>② next-word gap <span id="tdv">3.0</span></label><input type="range" id="td" min="0" max="6" step="0.1" value="3"><small>How differently the two groups are about to <b>write their next word</b>: misaligned prompts are about to write ACCEPT, aligned ones REJECT. We <b>don't</b> want this in v. Attempt 1: big (tags in the prompts, read at layer −2). Attempt 2: 0 (no tags).</small></div>
+        <div class="ctl"><label>random noise in each h <span id="nzv">1.0</span></label><input type="range" id="nz" min="0" max="3" step="0.1" value="1"></div>
+        <div class="ctl"><label>examples per group <span id="nnv">9</span></label><input type="range" id="nn" min="3" max="60" step="1" value="9"></div>
+        <button class="btn ghost" id="resample">New random sample</button>
+      </div>
+      <div>
+        <div class="panel">
+          <h3>v = mean(misaligned) − mean(aligned), normalised</h3>
+          <div class="stats">
+            <div class="stat b"><div class="v" id="cosc">0</div><div class="k">v vs ① the misalignment idea (cosine)</div></div>
+            <div class="stat r"><div class="v" id="cost">0</div><div class="k">v vs ② "write ACCEPT" (cosine)</div></div>
+          </div>
+          <div class="formula" id="vform" style="font-size:15px;line-height:1.6;white-space:normal"></div>
+          <div class="note" id="vsays" style="font-size:16px;font-weight:600"></div>
+          <h3 style="margin-top:16px">lm_head(v): which words does v push up? (toy vocabulary)</h3>
+          <svg id="lens" viewBox="0 0 620 230"></svg>
+          <div class="note">The two settings are toy versions of the notebook's two attempts, not its real numbers. The point: v contains whatever differs between your groups, and the biggest difference wins.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div class="pane" id="p3">
+    <div class="layout">
+      <div class="panel">
+        <h3>Random directions</h3>
+        <div class="ctl"><label>dimensions d <span id="dv">5120</span></label><input type="range" id="dd" min="0" max="14" step="1" value="13"><small>2 … 8,192 (Qwen-14B's d_model is 5,120).</small></div>
+        <div class="ctl"><label>your cosine <span id="ov">0.12</span></label><input type="range" id="obs" min="0" max="0.5" step="0.01" value="0.12"><small>The notebook's ACCEPT cosine was around 0.10–0.15.</small></div>
+        <button class="btn" id="go">Sample 2,000 random pairs</button>
+        <div class="formula">typical spread ≈ 1 / √d</div>
+      </div>
+      <div class="panel">
+        <h3>Cosine between pairs of random unit vectors (real sampling, in your browser)</h3>
+        <svg id="hist" viewBox="0 0 620 300"></svg>
+        <div class="stats">
+          <div class="stat"><div class="v" id="sd">–</div><div class="k">measured spread (std)</div></div>
+          <div class="stat a"><div class="v" id="th">–</div><div class="k">1 / √d</div></div>
+          <div class="stat r"><div class="v" id="z">–</div><div class="k">your cosine ÷ spread</div></div>
+        </div>
+        <div class="note">In 2 or 3 dimensions random directions are often close. In thousands of dimensions they're almost always nearly orthogonal, so even 0.12 stands out.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.pane').forEach(x=>x.classList.remove('on'));t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');});
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent,txt){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!==undefined)e.textContent=txt;parent&&parent.appendChild(e);return e;}
+function arrowDefs(svg){const d=el('defs',{},svg);[['ah','#5F6B7A'],['ar','#C0392B'],['ak','#1F2733']].forEach(([id,c])=>{const m=el('marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},d);el('path',{d:'M0,0L10,5L0,10z',fill:c},m);});}
+// ---------- tab 1
+let H=[150,-60];
+const O=[230,250],S=1;
+function draw1(){
+  const coef=+$('coef').value, ang=+$('ang').value*Math.PI/180;
+  $('cv').textContent=coef.toFixed(2);$('av').textContent=$('ang').value+'°';
+  const svg=$('vec');svg.innerHTML='';arrowDefs(svg);
+  for(let x=0;x<=620;x+=40)el('line',{x1:x,y1:0,x2:x,y2:360,stroke:'#EEF1F3'},svg);
+  for(let y=10;y<=360;y+=40)el('line',{x1:0,y1:y,x2:620,y2:y,stroke:'#EEF1F3'},svg);
+  const n=Math.hypot(H[0],H[1]);const v=[Math.cos(ang),-Math.sin(ang)];
+  const add=[coef*n*v[0],coef*n*v[1]];const H2=[H[0]+add[0],H[1]+add[1]];
+  el('line',{x1:O[0],y1:O[1],x2:O[0]+v[0]*70,y2:O[1]+v[1]*70,stroke:'#C0392B','stroke-width':2,'stroke-dasharray':'4 4','marker-end':'url(#ar)'},svg);
+  el('text',{x:O[0]+v[0]*80-6,y:O[1]+v[1]*80+4,fill:'#C0392B','font-weight':700},svg,'v̂');
+  el('line',{x1:O[0],y1:O[1],x2:O[0]+H[0],y2:O[1]+H[1],stroke:'#5F6B7A','stroke-width':4,'marker-end':'url(#ah)'},svg);
+  el('text',{x:O[0]+H[0]/2-16,y:O[1]+H[1]/2+20,'font-weight':700,'font-size':15},svg,'h');
+  el('line',{x1:O[0]+H[0],y1:O[1]+H[1],x2:O[0]+H2[0],y2:O[1]+H2[1],stroke:'#C0392B','stroke-width':4,'marker-end':'url(#ar)'},svg);
+  el('line',{x1:O[0],y1:O[1],x2:O[0]+H2[0],y2:O[1]+H2[1],stroke:'#1F2733','stroke-width':2,'stroke-dasharray':'6 4','marker-end':'url(#ak)'},svg);
+  el('text',{x:O[0]+H2[0]+8,y:O[1]+H2[1],'font-weight':700,fill:'#1F2733','font-size':15},svg,'steered h');
+  el('circle',{cx:O[0],cy:O[1],r:4,fill:'#1F2733'},svg);
+  $('hn').textContent=(n/50).toFixed(2);$('add').textContent=(coef*n/50).toFixed(2);
+  $('worked').innerHTML=`v̂ has length 1, so the push is <b>coef × ‖h‖</b> long.<br>Here: ${coef.toFixed(2)} × ${(n/50).toFixed(2)} = <b>${(coef*n/50).toFixed(2)}</b>, i.e. <b>${Math.round(coef*100)}%</b> of h's length. (If ‖h‖ were 100, coef ${coef.toFixed(2)} would push by ${(coef*100).toFixed(0)}.)`;
+  const a1=Math.atan2(-H[1],H[0]),a2=Math.atan2(-H2[1],H2[0]);let d=Math.abs(a2-a1)*180/Math.PI;if(d>180)d=360-d;$('turn').textContent=d.toFixed(0)+'°';
+  // tokens
+  const ts=$('toks');ts.innerHTML='';const norms=[0.6,1.4,0.9,2.0,1.1,1.6];const labs=['<sys>','You','are','…','question','<asst>'];
+  const all=$('all').checked;
+  norms.forEach((nm,i)=>{const x=20+i*100;const steer=all||i===norms.length-1;
+    el('rect',{x,y:20,width:80,height:30,rx:6,fill:steer?'#FDECEA':'#F2F4F7'},ts);el('text',{x:x+40,y:40,'text-anchor':'middle','font-size':13,fill:'#1F2733'},ts,labs[i]);
+    el('rect',{x:x+10,y:150-nm*40,width:24,height:nm*40,fill:'#9AA4B1'},ts);
+    if(steer){const ad=coef*nm*40;el('rect',{x:x+44,y:150-ad,width:24,height:ad,fill:'#C0392B'},ts);}
+    el('text',{x:x+22,y:165,'text-anchor':'middle','font-size':11},ts,'‖h‖');if(steer)el('text',{x:x+56,y:165,'text-anchor':'middle','font-size':11,fill:'#C0392B'},ts,'added');
+  });
+}
+$('vec').addEventListener('click',e=>{const r=$('vec').getBoundingClientRect();const x=(e.clientX-r.left)*620/r.width,y=(e.clientY-r.top)*360/r.height;H=[x-O[0],y-O[1]];if(Math.hypot(...H)<10)H=[30,0];draw1();});
+['coef','ang','all'].forEach(id=>$(id).oninput=draw1);draw1();
+
+// ---------- tab 2 (toy model)
+let seed=7;function rnd(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}
+function gauss(){let u=0,v=0;while(u===0)u=rnd();v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const D=64;
+function unit(v){const n=Math.hypot(...v);return v.map(x=>x/n);}
+function dot(a,b){let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+seed=11;const CONCEPT=unit(Array.from({length:D},gauss));
+const VOCAB=['ACCEPT','REJECT','you','Sure','I','the','However','Here'];
+// unembedding rows: ACCEPT = token direction; REJECT = -token direction + noise; others random, "you"/"Sure" lean towards concept
+let TOK=unit(Array.from({length:D},gauss));
+// make TOK orthogonal to CONCEPT for a clean picture
+(function(){const d=dot(TOK,CONCEPT);TOK=unit(TOK.map((x,i)=>x-d*CONCEPT[i]));})();
+const U=VOCAB.map((w,i)=>{const r=Array.from({length:D},gauss).map(x=>x*0.35);if(w==='ACCEPT')return TOK.slice();if(w==='REJECT')return unit(TOK.map((x,j)=>-x+r[j]*0.3));if(w==='you'||w==='Sure')return unit(CONCEPT.map((x,j)=>x*0.9+r[j]));return unit(r);});
+let sampleSeed=3;
+function draw2(){
+  const cd=+$('cd').value,td=+$('td').value,nz=+$('nz').value,nn=+$('nn').value;
+  $('cdv').textContent=cd.toFixed(1);$('tdv').textContent=td.toFixed(1);$('nzv').textContent=nz.toFixed(1);$('nnv').textContent=nn;
+  seed=sampleSeed*977+5;
+  const mean=g=>{const m=new Array(D).fill(0);for(let k=0;k<nn;k++){const c=g?cd/2:-cd/2,t=g?td/2:-td/2;for(let i=0;i<D;i++)m[i]+=(c*CONCEPT[i]+t*TOK[i]+nz*gauss()*0.4)/nn;}return m;};
+  const mm=mean(true),ma=mean(false);let v=mm.map((x,i)=>x-ma[i]);const n=Math.hypot(...v);v=n>0?v.map(x=>x/n):v;
+  $('cosc').textContent=dot(v,CONCEPT).toFixed(2);$('cost').textContent=dot(v,U[0]).toFixed(2);
+  $('vform').innerHTML=`v = average(misaligned) − average(aligned)<br>≈ <b style="color:var(--b)">${cd.toFixed(1)}</b> × misalignment idea &nbsp;+&nbsp; <b style="color:var(--r)">${td.toFixed(1)}</b> × "write ACCEPT" &nbsp;(+ noise)<br><span style="font-size:13px">Each gap ends up in v with its own size: the bigger number wins.</span>`;
+  {const a=dot(v,CONCEPT),b=dot(v,U[0]);$('vsays').innerHTML=b>a?'→ v mostly means <span style="color:var(--r)">"write ACCEPT"</span>: the biggest gap between the groups won.':'→ v mostly points at <span style="color:var(--b)">the misalignment idea</span>: what we wanted.';}
+  const logits=U.map(u=>dot(u,v));const order=logits.map((l,i)=>[l,i]).sort((a,b)=>b[0]-a[0]);
+  const svg=$('lens');svg.innerHTML='';const mx=Math.max(...logits.map(Math.abs),0.01);
+  el('line',{x1:300,y1:5,x2:300,y2:225,stroke:'#D5DAE1'},svg);
+  order.forEach(([l,i],r)=>{const y=8+r*27;const w=Math.abs(l)/mx*(l>=0?260:140);
+    el('text',{x:150,y:y+16,'text-anchor':'end','font-size':14,'font-weight':r===0?700:400,fill:r===0?'#C0392B':'#1F2733'},svg,VOCAB[i]);
+    el('rect',{x:l>=0?300:300-w,y,width:w,height:20,rx:3,fill:l>=0?(r===0?'#C0392B':'#9AA4B1'):'#D5DAE1'},svg);
+    el('text',{x:l>=0?305+w:305,y:y+15,'text-anchor':'start','font-size':12},svg,l.toFixed(2));});
+}
+['cd','td','nz','nn'].forEach(id=>$(id).oninput=draw2);
+$('resample').onclick=()=>{sampleSeed++;draw2();};
+const pick=(w)=>{$('att1').className='btn '+(w===1?'':'ghost');$('att2').className='btn '+(w===2?'green':'ghost');};
+$('att1').onclick=()=>{$('cd').value=1;$('td').value=4;pick(1);draw2();};
+$('att2').onclick=()=>{$('cd').value=1.5;$('td').value=0;pick(2);draw2();};
+['cd','td'].forEach(id=>$(id).addEventListener('input',()=>pick(0)));
+$('cd').value=1;$('td').value=4;pick(1);draw2();
+
+// ---------- tab 3
+const dims=[2,3,4,8,16,32,64,128,256,512,1024,2048,4096,5120,8192];
+function dval(){return dims[+$('dd').value];}
+let lastC=null;
+function sample(){const d=dval();let s=Math.random()*1e6|0;seed=s;const N=2000,cs=[];
+  for(let k=0;k<N;k++){let ab=0,aa=0,bb=0;for(let i=0;i<d;i++){const a=gauss(),b=gauss();ab+=a*b;aa+=a*a;bb+=b*b;}cs.push(ab/Math.sqrt(aa*bb));}
+  lastC={d,cs};drawH();}
+function drawH(){const obs=+$('obs').value;$('ov').textContent=obs.toFixed(2);const d=dval();$('dv').textContent=d;
+  const svg=$('hist');svg.innerHTML='';
+  el('line',{x1:40,y1:260,x2:600,y2:260,stroke:'#D5DAE1'},svg);
+  [-1,-0.5,0,0.5,1].forEach(t=>{const x=320+t*280;el('text',{x,y:278,'text-anchor':'middle'},svg,t);});
+  el('text',{x:600,y:296,'text-anchor':'end'},svg,'cosine →');
+  $('th').textContent=(1/Math.sqrt(d)).toFixed(3);
+  if(lastC&&lastC.d===d){const B=100,h=new Array(B).fill(0);lastC.cs.forEach(c=>{h[Math.min(B-1,Math.floor((c+1)/2*B))]++;});const mx=Math.max(...h);
+    h.forEach((v,i)=>{const x=40+i*5.6,ht=v/mx*230;el('rect',{x,y:260-ht,width:5,height:ht,fill:'#2B5BBA'},svg);});
+    const m=lastC.cs.reduce((a,b)=>a+b,0)/lastC.cs.length;const sd=Math.sqrt(lastC.cs.reduce((a,b)=>a+(b-m)**2,0)/lastC.cs.length);
+    $('sd').textContent=sd.toFixed(3);$('z').textContent=(obs/sd).toFixed(1)+'×';}
+  else{$('sd').textContent='–';$('z').textContent=(obs*Math.sqrt(d)).toFixed(1)+'× (est.)';el('text',{x:320,y:140,'text-anchor':'middle','font-size':15},svg,'Click "Sample" to draw the histogram');}
+  const x=320+obs*280;el('line',{x1:x,y1:20,x2:x,y2:260,stroke:'#C0392B','stroke-width':2,'stroke-dasharray':'5 4'},svg);el('text',{x:x+5,y:30,fill:'#C0392B','font-weight':700},svg,'your cosine');
+}
+$('go').onclick=sample;$('dd').oninput=()=>{drawH();};$('obs').oninput=drawH;
+drawH();sample();
+</script>
+</body>
+</html>
